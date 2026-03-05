@@ -1,0 +1,4 @@
+terraform
+awscli
+git
+apache2
