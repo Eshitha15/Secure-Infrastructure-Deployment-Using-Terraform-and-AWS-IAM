@@ -1,0 +1,34 @@
+name: Deploy Web App to EC2
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            sudo apt update
+            sudo apt install apache2 git -y
+
+            cd /home/ubuntu
+
+            rm -rf app
+            git clone https://github.com/pranavchaitanya14/secure-aws-terraform-webapp.git app
+
+            sudo rm -rf /var/www/html/*
+            sudo cp app/* /var/www/html/
+
+            sudo systemctl restart apache2
